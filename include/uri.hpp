@@ -66,29 +66,17 @@ namespace Uri
         /**
          *  @brief
          *      This method returns the "path" element of the URI.
-         *      as a sequence step
+         *      as a sequence segment
          *
          *  @note
-         *      if the first step of the path is an empty string.
+         *      if the first segment of the path is an empty string.
          *      then the URI has an absolute path.
          *
          *  @return
          *      The "path" element of the URI is returned
-         *      as a sequence of steps.
+         *      as a sequence of segments.
         **/
         std::vector<std::string> getPath() const;
-
-        /**
-         *  @brief
-         *      This method sets the character or character sequence
-         *      that should be interpreted as a path delimiter
-         *
-         *  @param[in]
-         *      This is the character or character sequence
-         *      that should be interpreted as a path delimiter.
-         *
-        **/
-        void setPathDelimiter(const std::string& newPathDelimiter);
 
     private:
         struct Imp;

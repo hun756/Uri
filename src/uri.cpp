@@ -23,12 +23,6 @@ namespace Uri
         *      This is the "path" elements of URI.
        **/
         std::vector<std::string> path;
-
-        /**
-         *  This method sets the character or character sequence
-         *  that should be interpreted as a path delimiter
-        **/
-        std::string pathDelimiter = "/";
     };
 
 
@@ -52,7 +46,7 @@ namespace Uri
         //> Second parse host
         if (rest.substr(0, 2) == "//")
         {
-            const auto authorityEnd = rest.find(imp->pathDelimiter, 2);
+            const auto authorityEnd = rest.find('/', 2);
             imp->host = rest.substr(2, authorityEnd - 2);
             rest = rest.substr(authorityEnd);
 
@@ -65,7 +59,7 @@ namespace Uri
 
         //> Finally, parse the path
         imp->path.clear();
-        if (rest == imp->pathDelimiter)
+        if (rest == "/")
         {
             imp->path.emplace_back("");
         }
@@ -73,7 +67,7 @@ namespace Uri
         {
             for (;;)
             {
-                auto pathDelimiter = rest.find(imp->pathDelimiter);
+                auto pathDelimiter = rest.find('/');
                 if (pathDelimiter == std::string::npos)
                 {
                     imp->path.push_back(rest);
@@ -85,7 +79,7 @@ namespace Uri
                             rest.begin(),
                             rest.begin() + pathDelimiter
                     );
-                    rest = rest.substr(pathDelimiter + imp->pathDelimiter.length());
+                    rest = rest.substr(pathDelimiter + 1);
                 }
             }
         }
@@ -110,12 +104,6 @@ namespace Uri
     std::vector<std::string> Uri::getPath() const
     {
         return imp->path;
-    }
-
-
-    void Uri::setPathDelimiter(const std::string& newPathDelimiter)
-    {
-        this->imp->pathDelimiter = newPathDelimiter;
     }
 
 }

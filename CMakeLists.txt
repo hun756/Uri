@@ -27,7 +27,7 @@ option(coverage "Use coverage flag" OFF)
 # Set the C++ standard you wish to use (will apply to all files).
 # If you do not use any features that limits the standard required,
 # you could omitt this line.
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 # Things to always include as flags. Change as needed.
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")  
@@ -128,18 +128,3 @@ add_library( googletest
 add_dependencies(googletest git_update)
 set_source_files_properties(${PROJECT_SOURCE_DIR}/external/googletest/googletest/src/gtest-all.cc  PROPERTIES GENERATED 1)
 set_source_files_properties(${PROJECT_SOURCE_DIR}/external/googletest/googletest/src/gtest_main.cc PROPERTIES GENERATED 1)
-
-
-
-# --------------------------------------------------------------------------------
-#                            Misc (no change needed).
-# --------------------------------------------------------------------------------
-# Have CMake parse the config file, generating the config header, with
-# correct definitions. Here only used to make version number available to
-# the source code. Include "exampleConfig.h" (no .in suffix) in the source.
-configure_file (
-  "${PROJECT_SOURCE_DIR}/include/exampleConfig.h.in"
-  "${PROJECT_BINARY_DIR}/exampleConfig.h")
-# add the binary tree to the search path for include files
-# so that we will find exampleConfig.h
-include_directories("${PROJECT_BINARY_DIR}")
