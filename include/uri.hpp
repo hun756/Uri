@@ -78,6 +78,32 @@ namespace Uri
         **/
         std::vector<std::string> getPath() const;
 
+        /**
+         *  @brief
+         *      This methods returns an indication of whether or not
+         *      URI includes a port number.
+         *
+         *  @return
+         *      An indication of whether or not the
+         *      URI includes port number is returned
+        **/
+        bool hasPort() const;
+
+
+        /**
+         *  @brief
+         *      This method returns the port number element of the URI,
+         *      if it has one
+         *
+         *  @return
+         *      The port number element of the URI is returned.
+         *
+         *  @note
+         *      The returned port number is only valid if the
+         *      HasPort method returns true
+        **/
+        uint16_t getPort() const;
+
     private:
         struct Imp;
 

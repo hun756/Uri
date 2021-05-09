@@ -1,5 +1,6 @@
 #include "uri.hpp"
 #include <iostream>
+#include <sstream>
 
 namespace Uri
 {
@@ -17,6 +18,21 @@ namespace Uri
          *      This is the "host" element of URI.
         **/
         std::string host;
+
+
+        /**
+         *  @brief
+         *      The flag indicates whether or not the
+         *      URI includes a port number.
+        **/
+        bool hasPort = false;
+
+
+        /**
+         *  @brief
+         *      This is the port number element of the uri
+        **/
+        uint16_t port = 0;
 
         /**
         *  @brief
@@ -44,12 +60,39 @@ namespace Uri
 
 
         //> Second parse host
+        imp->hasPort = false;
         if (rest.substr(0, 2) == "//")
         {
             const auto authorityEnd = rest.find('/', 2);
-            imp->host = rest.substr(2, authorityEnd - 2);
-            rest = rest.substr(authorityEnd);
+            const auto portDelimiter = rest.find(':');
+            if (portDelimiter == std::string::npos)
+            {
+                imp->host = rest.substr(2, authorityEnd - 2);
+            }
+            else
+            {
+                imp->host = rest.substr(2, portDelimiter - 2);
+//                const auto portNumStr = rest.substr(portDelimiter + 1, authorityEnd - portDelimiter - 1);
 
+                uint32_t newPort = 0;
+                for (auto c : rest.substr(portDelimiter + 1, authorityEnd - portDelimiter - 1)) {
+                    if (!isdigit(c)) {
+                        return false;
+                    }
+
+                    newPort *= 10;
+                    newPort += static_cast<uint16_t>(c - '0');
+
+                    if ((newPort & ~((1 << 16) - 1)) != 0)  {
+                        return false;
+                    }
+                }
+
+                imp->port = static_cast<uint16_t>(newPort);
+                imp->hasPort = true;
+            }
+
+            rest = rest.substr(authorityEnd);
         }
         else
         {
@@ -96,7 +139,6 @@ namespace Uri
 
     std::string Uri::getHost() const
     {
-//        return imp->host;
         return imp->host;
     }
 
@@ -106,4 +148,15 @@ namespace Uri
         return imp->path;
     }
 
+
+    bool Uri::hasPort() const
+    {
+        return imp->hasPort;
+    }
+
+
+    uint16_t Uri::getPort() const
+    {
+        return imp->port;
+    }
 }
