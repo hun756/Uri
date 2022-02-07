@@ -7,20 +7,20 @@
 
 namespace Uri
 {
-    class Uri
-    {
-    public:
-        Uri();
+	class Uri
+	{
+	public:
+		Uri();
 
-        ~Uri();
-        Uri(const Uri&) = delete;
-        Uri(Uri&&) = delete;
-        Uri& operator =(const Uri&) = delete;
-        Uri& operator =(Uri&&) = delete;
+		~Uri();
+		Uri(const Uri&) = delete;
+		Uri(Uri&&) = delete;
+		Uri& operator=(const Uri&) = delete;
+		Uri& operator=(Uri&&) = delete;
 
-        //> Methods
-    public:
-        /**
+		//> Methods
+	public:
+		/**
          *  @brief
          *      This method builds the URI from the elements parsed
          *      from the given string rendering of a URI.
@@ -33,10 +33,9 @@ namespace Uri
          *      successfully is returned.
          *
         **/
-        bool parseFromString(const std::string& uriString);
+		bool parseFromString(const std::string& uriString);
 
-
-        /**
+		/**
          *  @brief
          *      This method returns the scheme element of the URI.
          *
@@ -47,10 +46,9 @@ namespace Uri
          *      This is returned if there is no "scheme" element in the URI.
          *
         **/
-        std::string getScheme() const;
+		std::string getScheme() const;
 
-
-        /**
+		/**
          *  @brief
          *      This method returns the scheme element of the URI.
          *
@@ -61,9 +59,9 @@ namespace Uri
          *      This is returned if there is no "host" element in the URI.
          *
         **/
-        std::string getHost() const;
+		std::string getHost() const;
 
-        /**
+		/**
          *  @brief
          *      This method returns the "path" element of the URI.
          *      as a sequence segment
@@ -76,9 +74,9 @@ namespace Uri
          *      The "path" element of the URI is returned
          *      as a sequence of segments.
         **/
-        std::vector<std::string> getPath() const;
+		std::vector<std::string> getPath() const;
 
-        /**
+		/**
          *  @brief
          *      This methods returns an indication of whether or not
          *      URI includes a port number.
@@ -87,10 +85,9 @@ namespace Uri
          *      An indication of whether or not the
          *      URI includes port number is returned
         **/
-        bool hasPort() const;
+		bool hasPort() const;
 
-
-        /**
+		/**
          *  @brief
          *      This method returns the port number element of the URI,
          *      if it has one
@@ -102,13 +99,13 @@ namespace Uri
          *      The returned port number is only valid if the
          *      HasPort method returns true
         **/
-        uint16_t getPort() const;
+		uint16_t getPort() const;
 
-    private:
-        struct Impl;
+	private:
+		struct Impl;
 
-        std::unique_ptr<Impl> impl;
-    };
-}
+		std::unique_ptr<Impl> impl;
+	};
+} // namespace Uri
 
 #endif /* end of include guard : URI_HPP */
