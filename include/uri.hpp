@@ -105,9 +105,9 @@ namespace Uri
         uint16_t getPort() const;
 
     private:
-        struct Imp;
+        struct Impl;
 
-        std::unique_ptr<Imp> imp;
+        std::unique_ptr<Impl> impl;
     };
 }
 

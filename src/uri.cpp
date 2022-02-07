@@ -4,7 +4,7 @@
 
 namespace Uri
 {
-    struct Uri::Imp
+    struct Uri::Impl
     {
         /**
          *  @brief
@@ -42,7 +42,7 @@ namespace Uri
     };
 
 
-    Uri::Uri() : imp(new Imp)
+    Uri::Uri() : impl(new Impl)
     {
 
     }
@@ -55,23 +55,23 @@ namespace Uri
     {
         //> First parse schema
         const auto schemeEnd = uriString.find(':');
-        imp->scheme = uriString.substr(0, schemeEnd);
+        impl->scheme = uriString.substr(0, schemeEnd);
         auto rest = uriString.substr(schemeEnd + 1);
 
 
         //> Second parse host
-        imp->hasPort = false;
+        impl->hasPort = false;
         if (rest.substr(0, 2) == "//")
         {
             const auto authorityEnd = rest.find('/', 2);
             const auto portDelimiter = rest.find(':');
             if (portDelimiter == std::string::npos)
             {
-                imp->host = rest.substr(2, authorityEnd - 2);
+                impl->host = rest.substr(2, authorityEnd - 2);
             }
             else
             {
-                imp->host = rest.substr(2, portDelimiter - 2);
+                impl->host = rest.substr(2, portDelimiter - 2);
 //                const auto portNumStr = rest.substr(portDelimiter + 1, authorityEnd - portDelimiter - 1);
 
                 uint32_t newPort = 0;
@@ -88,23 +88,23 @@ namespace Uri
                     }
                 }
 
-                imp->port = static_cast<uint16_t>(newPort);
-                imp->hasPort = true;
+                impl->port = static_cast<uint16_t>(newPort);
+                impl->hasPort = true;
             }
 
             rest = rest.substr(authorityEnd);
         }
         else
         {
-            imp->host.clear();
+            impl->host.clear();
         }
 
 
         //> Finally, parse the path
-        imp->path.clear();
+        impl->path.clear();
         if (rest == "/")
         {
-            imp->path.emplace_back("");
+            impl->path.emplace_back("");
         }
         else if (!rest.empty())
         {
@@ -113,12 +113,12 @@ namespace Uri
                 auto pathDelimiter = rest.find('/');
                 if (pathDelimiter == std::string::npos)
                 {
-                    imp->path.push_back(rest);
+                    impl->path.push_back(rest);
                     break;
                 }
                 else
                 {
-                    imp->path.emplace_back(
+                    impl->path.emplace_back(
                             rest.begin(),
                             rest.begin() + pathDelimiter
                     );
@@ -133,30 +133,30 @@ namespace Uri
 
     std::string Uri::getScheme() const
     {
-        return imp->scheme;
+        return impl->scheme;
     }
 
 
     std::string Uri::getHost() const
     {
-        return imp->host;
+        return impl->host;
     }
 
 
     std::vector<std::string> Uri::getPath() const
     {
-        return imp->path;
+        return impl->path;
     }
 
 
     bool Uri::hasPort() const
     {
-        return imp->hasPort;
+        return impl->hasPort;
     }
 
 
     uint16_t Uri::getPort() const
     {
-        return imp->port;
+        return impl->port;
     }
 }
