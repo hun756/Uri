@@ -5,7 +5,7 @@
 #
 # For many purposes, you may not need to change anything about this file.
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.2)
 
 # Set project name here.
 project(URI)
