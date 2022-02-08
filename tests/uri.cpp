@@ -1,7 +1,19 @@
+#include <corecrt.h>
 #include <gtest/gtest.h>
 
 #include "uri.hpp"
 #include <vector>
+
+TEST(UriTests, ParseFromStringNoSchema) {
+    Uri::Uri uri;
+    ASSERT_TRUE(uri.parseFromString("foo/bar"));
+    ASSERT_EQ("", uri.getScheme());
+    ASSERT_EQ((std::vector<std::string>{
+            "foo",
+            "bar"
+    }), uri.getPath()
+    );
+}
 
 TEST(UriTests, ParseFromStringUrl) {
     Uri::Uri uri;
@@ -30,7 +42,7 @@ TEST(UriTests, ParseFromStringUrnDefaultPathDelimiter) {
 
 }
 
-TEST(Uritests, ParseFromStringPathCornerCases) {
+TEST(UriTests, ParseFromStringPathCornerCases) {
     struct TestVector {
         std::string pathIn;
         std::vector<std::string> pathOut;
@@ -86,34 +98,126 @@ TEST(UriTests, ParseFromStringTwiceFirstWithPortNumberThenWithout) {
 }
 
 
-TEST(Uritests, ParseFromStringBadPortNumberPurelyAlphabetic) {
+TEST(UriTests, ParseFromStringBadPortNumberPurelyAlphabetic) {
     Uri::Uri uri;
 
     ASSERT_FALSE(uri.parseFromString("https://example.com:spam/foo/bar"));
 }
 
-TEST(Uritests, ParseFromStringBadPortNumberStartsNumericEndsAlphabetic) {
+TEST(UriTests, ParseFromStringBadPortNumberStartsNumericEndsAlphabetic) {
     Uri::Uri uri;
 
     ASSERT_FALSE(uri.parseFromString("https://example.com:8080spam/foo/bar"));
 }
 
 
-TEST(Uritests, ParseFromStringLargestValidPortNumber) {
+TEST(UriTests, ParseFromStringLargestValidPortNumber) {
     Uri::Uri uri;
 
     ASSERT_TRUE(uri.parseFromString("https://example.com:65535/foo/bar"));
 }
 
-TEST(Uritests, ParseFromStringBadPortNumberTooBig) {
+TEST(UriTests, ParseFromStringBadPortNumberTooBig) {
     Uri::Uri uri;
 
     ASSERT_FALSE(uri.parseFromString("https://example.com:65536/foo/bar"));
 }
 
 
-TEST(Uritests, ParseFromStringBadPortNumberNegative) {
+TEST(UriTests, ParseFromStringBadPortNumberNegative) {
     Uri::Uri uri;
 
     ASSERT_FALSE(uri.parseFromString("https://example.com:-1564/foo/bar"));
+}
+
+TEST(UriTests, ParseFromStringAfterAuthority) {
+    Uri::Uri uri;
+    ASSERT_TRUE(uri.parseFromString("http://wwww.example.com"));
+}
+
+TEST(UriTests, ParseFromStringRelativeVsNonRelativeReferences) {
+    struct TestVector {
+        std::string uriString;
+        bool isRelative;
+    };
+
+    const std::vector<TestVector> testVecs {
+        { "http://wwww.example.com/", false },
+        { "http://wwww.example.com", false },
+        { "/", true },
+        { "foo", true }
+    };
+    
+    size_t index = 0;
+    for (const auto& testVec : testVecs ) {
+        Uri::Uri uri;
+        ASSERT_TRUE(uri.parseFromString(testVec.uriString)) << index;
+        ASSERT_EQ(testVec.isRelative, uri.isRelativeReference()) << index;
+        ++index;
+    }
+}
+
+TEST(UriTests, ParseFromStringRelativeVsNonRelativePaths) {
+    struct TestVector {
+        std::string uriString;
+        bool containsRelativePath;
+    };
+
+    const std::vector<TestVector> testVecs {
+        { "http://wwww.example.com/", false },
+        { "http://wwww.example.com", true },
+        { "/", false },
+        { "foo", true },
+
+        /**
+         * This is only a valid vector if we understand
+         * correctly that an empty string Is a valid
+         * "relative reference" URI with an wmpty path.
+        **/
+        {"", true}
+    };
+    
+    size_t index = 0;
+    for (const auto& testVec : testVecs ) {
+        Uri::Uri uri;
+        ASSERT_TRUE(uri.parseFromString(testVec.uriString)) << index;
+        ASSERT_EQ(testVec.containsRelativePath, uri.containsRelativePath()) << index;
+        ++index;
+    }
+}
+
+TEST(UriTests, ParseFromStringFragmentsAndQuery) {
+    struct TestVector {
+        std::string uriString;
+        std::string host;
+        std::string query;
+        std::string fragment;
+    };
+
+    const std::vector<TestVector> testVecs {
+        {"http://www.example.com/", "www.example.com", "", ""},
+        {"http://www.example.com?foo", "www.example.com", "foo", ""},
+        {"http://www.example.com#foo", "www.example.com", "", "foo"},
+        {"http://www.example.com?foo#bar", "www.example.com", "foo", "bar"},
+        {"http://www.example.com?earth#bar", "www.example.com", "earth", "bar"},
+        {"http://www.example.com/spam?foo#bar", "www.example.com", "foo", "bar"},
+
+        /**
+         * NOTE: curiously, but we think is coorect, that
+         * having a trailing quesiton mark is equivalent to not having
+         * any question mark, because in both cases, in the query element
+         * is emty string. Perhaps research deeper to see if this is right.
+        **/
+        {"http://www.example.com/?", "www.example.com", "", ""}
+    };
+
+    size_t index = 0;
+    for (const auto& testVec : testVecs) {
+        Uri::Uri uri;
+        ASSERT_TRUE(uri.parseFromString(testVec.uriString)) << index;
+        ASSERT_EQ(testVec.host, uri.getHost()) << index;
+        ASSERT_EQ(testVec.query, uri.getQuery()) << index;
+        ASSERT_EQ(testVec.fragment, uri.getFragment()) << index;
+        ++index;
+    }
 }

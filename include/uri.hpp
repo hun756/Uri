@@ -101,6 +101,53 @@ namespace Uri
         **/
 		uint16_t getPort() const;
 
+		/**
+         *  @brief
+         *      This method returns an indication of whether or not
+         *      the URI is relative reference. 
+         * 
+         *  @return 
+         *      An indicaiton of wether or nt the URI is a
+         *      relative reference is returned. 
+        **/
+		bool isRelativeReference() const;
+
+		/**
+         *  @brief
+         *      This method returns an indication of whether or not
+         *      the URI contains relative path. 
+         * 
+         *  @return An indicaiton of wether or nt the URI contains a
+         *          relative path is returned. 
+        **/
+		bool containsRelativePath() const;
+
+		/**
+         *  @brief 
+         *      This method returns the "fragment" element of the URI
+         *      if it has one.
+         * 
+         *  @return std::string 
+         *      The "fragment" element of the URI is returned.
+         * 
+         *  @retval ""
+         *      This is returned if there is no "fragment" element int he URI.
+        **/
+		std::string getFragment() const;
+
+        /**
+         *  @brief 
+         *      This method returns the "quey" element of the URI
+         *      if it has one.
+         * 
+         *  @return std::string 
+         *      The "quey" element of the URI is returned.
+         * 
+         *  @retval ""
+         *      This is returned if there is no "quey" element int he URI.
+        **/
+        std::string getQuery() const;
+
 	private:
 		struct Impl;
 
