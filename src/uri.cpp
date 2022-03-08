@@ -1,5 +1,29 @@
 #include "uri.hpp"
 
+namespace 
+{
+	bool parseUint16(const std::string& numberString, uint16_t& number)
+	{
+		uint32_t numberIn32Bits = 0;
+		for(auto c : numberString)
+		{
+			if(!isdigit(c))
+				return false;
+
+			numberIn32Bits *= 10;
+			numberIn32Bits += static_cast<uint16_t>(c - '0');
+
+			if((numberIn32Bits & ~((1 << 16) - 1)) != 0)
+			{
+				return false;
+			}
+		}
+
+		number = static_cast<uint16_t>(numberIn32Bits);
+		return true;
+	}
+}
+
 namespace Uri
 {
 	struct Uri::Impl
@@ -121,23 +145,15 @@ namespace Uri
 				impl->host = hostAndPathString.substr(0, portDelimiter);
 				// const auto portNumStr = authorityAndPathString.substr(portDelimiter + 1, authorityEnd - portDelimiter - 1);
 
-				uint32_t newPort = 0;
-				for(auto c :
-					hostAndPathString.substr(portDelimiter + 1, authorityEnd - portDelimiter - 1))
+				if(!parseUint16
+					(
+						hostAndPathString.substr(portDelimiter + 1, authorityEnd - portDelimiter - 1),
+						impl->port
+					)
+				)
 				{
-					if(!isdigit(c))
-						return false;
-
-					newPort *= 10;
-					newPort += static_cast<uint16_t>(c - '0');
-
-					if((newPort & ~((1 << 16) - 1)) != 0)
-					{
-						return false;
-					}
+					return false;
 				}
-
-				impl->port = static_cast<uint16_t>(newPort);
 				impl->hasPort = true;
 			}
 
