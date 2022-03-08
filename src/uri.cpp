@@ -1,6 +1,4 @@
 #include "uri.hpp"
-#include <iostream>
-#include <sstream>
 
 namespace Uri
 {
@@ -11,6 +9,12 @@ namespace Uri
          *      This is the "scheme" element of URI.
         **/
 		std::string scheme;
+
+		/**
+         *  @brief
+         *      This is the "User Info" element of URI.
+        **/
+		std::string userInfo;
 
 		/**
          *  @brief
@@ -74,31 +78,52 @@ namespace Uri
 			rest = uriString.substr(schemeEnd + 1);
 		}
 
-		//> Second parse host
+		//> Next parse the authority
+	
 		impl->hasPort = false;
 		const auto pathEnd = rest.find_first_of("?#");
-		auto hostandPathString = rest.substr(0, pathEnd);
-		const auto queryAndOrFragment = rest.substr(hostandPathString.length());
-		if(hostandPathString.substr(0, 2) == "//")
+		auto authorityAndPathString = rest.substr(0, pathEnd);
+		const auto queryAndOrFragment = rest.substr(authorityAndPathString.length());
+		std::string hostAndPathString;
+		if(authorityAndPathString.substr(0, 2) == "//")
 		{
-			auto authorityEnd = hostandPathString.find('/', 2);
+			///< Strip of the authority marker.
+			authorityAndPathString = authorityAndPathString.substr(2);
+
+			///< First seperate the authority from the path.
+			auto authorityEnd = authorityAndPathString.find('/', 2);
 			if(authorityEnd == std::string::npos)
 			{
-				authorityEnd = hostandPathString.length();
+				authorityEnd = authorityAndPathString.length();
 			}
-			const auto portDelimiter = hostandPathString.find(':');
+
+			///< Next Check if there is UserInfo, and if so, extract it
+			const auto userInfoDelimiter = authorityAndPathString.find('@');
+			if (userInfoDelimiter == std::string::npos)  {
+				impl->userInfo.clear();
+				hostAndPathString = authorityAndPathString;
+			} 
+			else
+			{ 
+
+				impl->userInfo = authorityAndPathString.substr(0, userInfoDelimiter);
+				hostAndPathString = authorityAndPathString.substr(userInfoDelimiter + 1);
+			}
+
+			///< Next, parsing host and port from authority and path.
+			const auto portDelimiter = hostAndPathString.find(':');
 			if(portDelimiter == std::string::npos)
 			{
-				impl->host = hostandPathString.substr(2, authorityEnd - 2);
+				impl->host = hostAndPathString.substr(0, authorityEnd);
 			}
 			else
 			{
-				impl->host = hostandPathString.substr(2, portDelimiter - 2);
-				// const auto portNumStr = hostandPathString.substr(portDelimiter + 1, authorityEnd - portDelimiter - 1);
+				impl->host = hostAndPathString.substr(0, portDelimiter);
+				// const auto portNumStr = authorityAndPathString.substr(portDelimiter + 1, authorityEnd - portDelimiter - 1);
 
 				uint32_t newPort = 0;
 				for(auto c :
-					hostandPathString.substr(portDelimiter + 1, authorityEnd - portDelimiter - 1))
+					hostAndPathString.substr(portDelimiter + 1, authorityEnd - portDelimiter - 1))
 				{
 					if(!isdigit(c))
 						return false;
@@ -116,14 +141,15 @@ namespace Uri
 				impl->hasPort = true;
 			}
 
-			hostandPathString = hostandPathString.substr(authorityEnd);
+			hostAndPathString = authorityAndPathString.substr(authorityEnd);
 		}
 		else
 		{
 			impl->host.clear();
+			hostAndPathString = authorityAndPathString;
 		}
 
-		auto pathString = hostandPathString;
+		auto pathString = hostAndPathString;
 		//> Next, parse the path
 		impl->path.clear();
 		if(pathString == "/")
@@ -194,6 +220,11 @@ namespace Uri
 	std::string Uri::getFragment() const
 	{
 		return impl->fragment;
+	}
+
+	std::string Uri::getUserInfo() const
+	{
+		return impl->userInfo;
 	}
 
 	std::string Uri::getScheme() const

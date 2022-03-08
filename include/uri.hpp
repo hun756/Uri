@@ -50,6 +50,18 @@ namespace Uri
 
 		/**
          *  @brief
+         *      This method returns the "UserInfo" element of the URI.
+         *
+         *  @return
+         *      The "UserInfo" element of the URI is returned.
+         *
+         *  @retval
+         *      This is returned if there is no "UserInfo" element in the URI.
+        **/
+		std::string getUserInfo() const;
+
+		/**
+         *  @brief
          *      This method returns the scheme element of the URI.
          *
          *  @return
@@ -135,7 +147,7 @@ namespace Uri
         **/
 		std::string getFragment() const;
 
-        /**
+		/**
          *  @brief 
          *      This method returns the "quey" element of the URI
          *      if it has one.
@@ -146,7 +158,7 @@ namespace Uri
          *  @retval ""
          *      This is returned if there is no "quey" element int he URI.
         **/
-        std::string getQuery() const;
+		std::string getQuery() const;
 
 	private:
 		struct Impl;
