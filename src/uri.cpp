@@ -28,13 +28,13 @@ namespace Uri
 {
 	struct Uri::Impl
 	{
-		/**
+	/**
          *  @brief
          *      This is the "scheme" element of URI.
         **/
 		std::string scheme;
 
-		/**
+	/**
          *  @brief
          *      This is the "User Info" element of URI.
         **/
@@ -46,7 +46,7 @@ namespace Uri
         **/
 		std::string host;
 
-		/**
+	/**
          *  @brief
          *      The flag indicates whether or not the
          *      URI includes a port number.
@@ -59,20 +59,20 @@ namespace Uri
         **/
 		uint16_t port = 0;
 
-		/**
+	/**
          *  @brief
          *      This is the "path" elements of URI.
         **/
 		std::vector<std::string> path;
 
-		/**
+	/**
          *  @brief 
          *      This is the "fragment" element of the URI.
          *      if it has one.
          */
 		std::string fragment;
 
-		/**
+	/**
          *  @brief 
          *      This is the "query" element of the URI.
          *      if it has one.
