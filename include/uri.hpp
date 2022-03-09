@@ -20,7 +20,7 @@ namespace Uri
 
 		//> Methods
 	public:
-		/**
+	/**
          *  @brief
          *      This method builds the URI from the elements parsed
          *      from the given string rendering of a URI.
@@ -35,7 +35,7 @@ namespace Uri
         **/
 		bool parseFromString(const std::string& uriString);
 
-		/**
+	/**
          *  @brief
          *      This method returns the scheme element of the URI.
          *
@@ -48,7 +48,7 @@ namespace Uri
         **/
 		std::string getScheme() const;
 
-		/**
+	/**
          *  @brief
          *      This method returns the "UserInfo" element of the URI.
          *
@@ -60,7 +60,7 @@ namespace Uri
         **/
 		std::string getUserInfo() const;
 
-		/**
+	/**
          *  @brief
          *      This method returns the scheme element of the URI.
          *
@@ -88,7 +88,7 @@ namespace Uri
         **/
 		std::vector<std::string> getPath() const;
 
-		/**
+	/**
          *  @brief
          *      This methods returns an indication of whether or not
          *      URI includes a port number.
@@ -99,7 +99,7 @@ namespace Uri
         **/
 		bool hasPort() const;
 
-		/**
+	/**
          *  @brief
          *      This method returns the port number element of the URI,
          *      if it has one
@@ -124,7 +124,7 @@ namespace Uri
         **/
 		bool isRelativeReference() const;
 
-		/**
+	/**
          *  @brief
          *      This method returns an indication of whether or not
          *      the URI contains relative path. 
@@ -134,7 +134,7 @@ namespace Uri
         **/
 		bool containsRelativePath() const;
 
-		/**
+	/**
          *  @brief 
          *      This method returns the "fragment" element of the URI
          *      if it has one.
@@ -147,7 +147,7 @@ namespace Uri
         **/
 		std::string getFragment() const;
 
-		/**
+	/**
          *  @brief 
          *      This method returns the "quey" element of the URI
          *      if it has one.
