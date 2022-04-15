@@ -34,9 +34,9 @@
 
 # Build directory
 build/
-cmake-build-debug
-.idea
-.vscode
+cmake-build-debug/
+.idea/
+.vscode/
 
 # Doxygen output
 html/
