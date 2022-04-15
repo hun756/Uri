@@ -247,3 +247,13 @@ TEST(UriTests, ParseFromStringUserinfo) {
         ++index;
     }
 }
+
+TEST(UriTests, ParseFromStringTwiceFirstUserInfoThenWithout)
+{
+	Uri::Uri uri;
+
+
+	ASSERT_TRUE(uri.parseFromString("http://joe@www.example.com/foo/bar"));
+	ASSERT_TRUE(uri.parseFromString("/foo/bar"));
+	ASSERT_TRUE(uri.getUserInfo().empty());
+}

@@ -159,6 +159,7 @@ namespace Uri
 		}
 		else
 		{
+			impl->userInfo.clear();
 			impl->host.clear();
 			hostAndPathString = authorityAndPathString;
 		}
