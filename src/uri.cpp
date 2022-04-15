@@ -28,6 +28,8 @@ namespace Uri
 {
 	struct Uri::Impl
 	{
+		///< Properties
+
 		/**
          *  @brief
          *      This is the "scheme" element of URI.
@@ -78,6 +80,47 @@ namespace Uri
          *      if it has one.
          */
 		std::string query;
+
+		///< Methods
+		/**
+		 * 	@brief
+		 * 		This method builds internal path element sequence
+		 * 		by parsing it from the given path string
+		 *
+		 * 	@param[in] pathString
+		 * 		This is the string containing the whole path of the URI.
+		 * 	@return
+		 * 		An indication if the path was parsed correctly or not
+		 * 		is returned.
+		**/
+		bool parsePath(std::string pathString)
+		{
+			path.clear();
+			if(pathString == "/")
+			{
+				path.emplace_back("");
+				pathString.clear();
+			}
+			else if(!pathString.empty())
+			{
+				for(;;)
+				{
+					auto pathDelimiter = pathString.find('/');
+					if(pathDelimiter == std::string::npos)
+					{
+						path.push_back(pathString);
+						pathString.clear();
+						break;
+					}
+					else
+					{
+						path.emplace_back(pathString.begin(), pathString.begin() + pathDelimiter);
+						pathString = pathString.substr(pathDelimiter + 1);
+					}
+				}
+			}
+			return true;
+		}
 	};
 
 	Uri::Uri()
@@ -168,30 +211,8 @@ namespace Uri
 		}
 
 		//> Next, parse the path
-		impl->path.clear();
-		if(pathString == "/")
-		{
-			impl->path.emplace_back("");
-			pathString.clear();
-		}
-		else if(!pathString.empty())
-		{
-			for(;;)
-			{
-				auto pathDelimiter = pathString.find('/');
-				if(pathDelimiter == std::string::npos)
-				{
-					impl->path.push_back(pathString);
-					pathString.clear();
-					break;
-				}
-				else
-				{
-					impl->path.emplace_back(pathString.begin(), pathString.begin() + pathDelimiter);
-					pathString = pathString.substr(pathDelimiter + 1);
-				}
-			}
-		}
+		if(!impl->parsePath(pathString))
+			return false;
 
 		// next parse the fragment if there is one
 		const auto fragmentDelimiter = queryAndOrFragment.find('#');
