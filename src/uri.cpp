@@ -1,6 +1,6 @@
 #include "uri.hpp"
 
-namespace 
+namespace
 {
 	bool parseUint16(const std::string& numberString, uint16_t& number)
 	{
@@ -22,19 +22,19 @@ namespace
 		number = static_cast<uint16_t>(numberIn32Bits);
 		return true;
 	}
-}
+} // namespace
 
 namespace Uri
 {
 	struct Uri::Impl
 	{
-	/**
+		/**
          *  @brief
          *      This is the "scheme" element of URI.
         **/
 		std::string scheme;
 
-	/**
+		/**
          *  @brief
          *      This is the "User Info" element of URI.
         **/
@@ -46,7 +46,7 @@ namespace Uri
         **/
 		std::string host;
 
-	/**
+		/**
          *  @brief
          *      The flag indicates whether or not the
          *      URI includes a port number.
@@ -59,20 +59,20 @@ namespace Uri
         **/
 		uint16_t port = 0;
 
-	/**
+		/**
          *  @brief
          *      This is the "path" elements of URI.
         **/
 		std::vector<std::string> path;
 
-	/**
+		/**
          *  @brief 
          *      This is the "fragment" element of the URI.
          *      if it has one.
          */
 		std::string fragment;
 
-	/**
+		/**
          *  @brief 
          *      This is the "query" element of the URI.
          *      if it has one.
@@ -103,7 +103,7 @@ namespace Uri
 		}
 
 		//> Next parse the authority
-	
+
 		impl->hasPort = false;
 		const auto pathEnd = rest.find_first_of("?#");
 		auto authorityAndPathString = rest.substr(0, pathEnd);
@@ -123,12 +123,13 @@ namespace Uri
 
 			///< Next Check if there is UserInfo, and if so, extract it
 			const auto userInfoDelimiter = authorityAndPathString.find('@');
-			if (userInfoDelimiter == std::string::npos)  {
+			if(userInfoDelimiter == std::string::npos)
+			{
 				impl->userInfo.clear();
 				hostAndPathString = authorityAndPathString;
-			} 
+			}
 			else
-			{ 
+			{
 
 				impl->userInfo = authorityAndPathString.substr(0, userInfoDelimiter);
 				hostAndPathString = authorityAndPathString.substr(userInfoDelimiter + 1);
@@ -145,12 +146,9 @@ namespace Uri
 				impl->host = hostAndPathString.substr(0, portDelimiter);
 				// const auto portNumStr = authorityAndPathString.substr(portDelimiter + 1, authorityEnd - portDelimiter - 1);
 
-				if(!parseUint16
-					(
-						hostAndPathString.substr(portDelimiter + 1, authorityEnd - portDelimiter - 1),
-						impl->port
-					)
-				)
+				if(!parseUint16(hostAndPathString.substr(portDelimiter + 1,
+														 authorityEnd - portDelimiter - 1),
+								impl->port))
 				{
 					return false;
 				}
