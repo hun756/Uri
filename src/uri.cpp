@@ -2,6 +2,21 @@
 
 namespace
 {
+	/**
+	 * 	@brief 
+	 *  	This function parses the given string as an unsigned 16-bit
+	 * 		integer, detecting invalid characters, owerflow, etc.
+	 * 
+	 * 	@param numberString 
+	 * 		This is the string containing the number to parse.
+	 * 
+	 * 	@param[out] number
+	 * 		This is where to store port number parsed.
+	 *  
+	 * 	@return
+	 * 		An indication of whether or not the number was parsed 
+	 * 		successfully is returned. 
+	**/
 	bool parseUint16(const std::string& numberString, uint16_t& number)
 	{
 		uint32_t numberIn32Bits = 0;
@@ -14,9 +29,7 @@ namespace
 			numberIn32Bits += static_cast<uint16_t>(c - '0');
 
 			if((numberIn32Bits & ~((1 << 16) - 1)) != 0)
-			{
 				return false;
-			}
 		}
 
 		number = static_cast<uint16_t>(numberIn32Bits);
@@ -82,6 +95,7 @@ namespace Uri
 		std::string query;
 
 		///< Methods
+
 		/**
 		 * 	@brief
 		 * 		This method builds internal path element sequence
@@ -120,6 +134,58 @@ namespace Uri
 				}
 			}
 			return true;
+		}
+
+		/**
+		 * 	@brief
+		 * 		This method parses the elements that make up the authority
+		 * 		composite part of the URI by parsing it from the given string
+		 *
+		 * 	@param[in] authorityString
+		 * 		This is the string containing the whole authority path of the URI.
+		 * 	@return
+		 * 		An indication if the path was parsed correctly or not
+		 * 		is returned.
+		**/
+		bool parseAuthority(const std::string& authorityString)
+		{
+			///< Next Check if there is UserInfo, and if so, extract it
+			const auto userInfoDelimiter = authorityString.find('@');
+			std::string hostPortString;
+			if(userInfoDelimiter == std::string::npos)
+			{
+				userInfo.clear();
+				hostPortString = authorityString;
+			}
+			else
+			{
+
+				userInfo = authorityString.substr(0, userInfoDelimiter);
+				hostPortString = authorityString.substr(userInfoDelimiter + 1);
+			}
+
+			///< Next, parsing host and port from authority and path.
+			const auto portDelimiter = hostPortString.find(':');
+			if(portDelimiter == std::string::npos)
+			{
+				host = hostPortString;
+				hasPort = false;
+			}
+			else
+			{
+				host = hostPortString.substr(0, portDelimiter);
+				// const auto portNumStr = authorityAndPathString.substr(portDelimiter + 1, authorityEnd - portDelimiter - 1);
+
+				const auto portString = hostPortString.substr(portDelimiter + 1);
+				if(!parseUint16(portString, port))
+				{
+					return false;
+				}
+				hasPort = true;
+			}
+
+			return true;
+			//			hostPortString = authorityAndPathString.substr(authorityEnd);
 		}
 	};
 
@@ -165,42 +231,9 @@ namespace Uri
 			pathString = authorityAndPathString.substr(authorityEnd);
 			auto authorityString = authorityAndPathString.substr(0, authorityEnd);
 
-			///< Next Check if there is UserInfo, and if so, extract it
-			const auto userInfoDelimiter = authorityString.find('@');
-			std::string hostPortString;
-			if(userInfoDelimiter == std::string::npos)
-			{
-				impl->userInfo.clear();
-				hostPortString = authorityString;
-			}
-			else
-			{
-
-				impl->userInfo = authorityString.substr(0, userInfoDelimiter);
-				hostPortString = authorityString.substr(userInfoDelimiter + 1);
-			}
-
-			///< Next, parsing host and port from authority and path.
-			const auto portDelimiter = hostPortString.find(':');
-			if(portDelimiter == std::string::npos)
-			{
-				impl->host = hostPortString;
-				impl->hasPort = false;
-			}
-			else
-			{
-				impl->host = hostPortString.substr(0, portDelimiter);
-				// const auto portNumStr = authorityAndPathString.substr(portDelimiter + 1, authorityEnd - portDelimiter - 1);
-
-				const auto portString = hostPortString.substr(portDelimiter + 1);
-				if(!parseUint16(portString,impl->port))
-				{
-					return false;
-				}
-				impl->hasPort = true;
-			}
-
-			hostPortString = authorityAndPathString.substr(authorityEnd);
+			///< Parse the elemnts inside authority
+			if(!impl->parseAuthority(authorityString))
+				return false;
 		}
 		else
 		{
